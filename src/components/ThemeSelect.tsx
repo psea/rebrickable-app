@@ -1,13 +1,24 @@
 import { useEffect, useState, ChangeEvent } from 'react';
 import _ from 'lodash';
-import { getAllPages, LegoThemeResponse, rebrickable } from "../utils/rebrickable";
+import styled from 'styled-components';
 
+import { getAllPages, LegoThemesRead, rebrickable } from "../utils/rebrickable";
+
+const Form = styled.form`
+  display: block;
+  width: 100%;
+  text-align: center;
+  position: sticky;
+  top: 2em;
+  height: 3em;
+  background-color: #ffcf00;
+`;
 interface ThemeSelectProps {
   onChange: (themeIds: number[]) => void,
 }
 
 function ThemeSelect({ onChange }: ThemeSelectProps) {
-  const [themes, setThemes] = useState<LegoThemeResponse[]>([]);
+  const [themes, setThemes] = useState<LegoThemesRead[]>([]);
   const [themeIds, setThemeIds] = useState<string>();
 
   /**
@@ -24,12 +35,12 @@ function ThemeSelect({ onChange }: ThemeSelectProps) {
       localStorage.setItem('themeIds', themeIds);
       onChange(JSON.parse(themeIds));
     }
-  }, [themeIds]);
+  }, [themeIds, onChange]);
 
   // fetch data on every component mount. Isn't it wasteful? Cache a response? Opt-in to React Query?
   useEffect( () => {
     (async () => {
-      const themes = await getAllPages<LegoThemeResponse>(rebrickable, '/api/v3/lego/themes/');
+      const themes = await getAllPages<LegoThemesRead>(rebrickable, '/api/v3/lego/themes/');
       setThemes(themes);
     })();
   }, []);
@@ -58,17 +69,19 @@ function ThemeSelect({ onChange }: ThemeSelectProps) {
   }
 
   return (
-    <select value={themeIds} onChange={onOptionChange}>
-      <option value="">--Select a theme--</option>
-      {themesGroupByName.map(theme => 
-        <option 
-          key={theme.ids[0]} 
-          value={JSON.stringify(theme.ids)}
-        >
-          {theme.ids + ' ' + theme.name}
-        </option>
-      )} 
-    </select>
+    <Form>
+      <select value={themeIds} onChange={onOptionChange}>
+        <option value="">--Select a theme--</option>
+        {themesGroupByName.map(theme => 
+          <option 
+            key={theme.ids[0]} 
+            value={JSON.stringify(theme.ids)}
+          >
+            {theme.ids + ' ' + theme.name}
+          </option>
+        )} 
+      </select>
+    </Form>
   );
 }
 

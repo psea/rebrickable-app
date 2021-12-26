@@ -1,16 +1,27 @@
 import { Routes, Route, HashRouter } from "react-router-dom";
+import styled from "styled-components";
 import './utils/rebrickable';
-import './components/ThemeSelect';
 
-import './App.css';
 import LegoSetDetails from './components/LegoSetDetails';
 import Overview from './components/Overview';
+
+const Container = styled.main`
+`;
+
+const Header = styled.header`
+  width: 100%;
+  text-align: center;
+  position: sticky;
+  top: 0px;
+  background: #ffcf00;
+  height: 2em;
+  text-transform: uppercase;
+`;
 
 function App() {
   return (
       <HashRouter>
-        <div>
-          <h1>Rebrickable</h1>
+          <Header>Rebrickable</Header>
           <Routes>
             <Route 
               path="/" 
@@ -21,7 +32,6 @@ function App() {
               element={<LegoSetDetails />} 
             />
           </Routes>
-        </div>
       </HashRouter>
   );
 }
