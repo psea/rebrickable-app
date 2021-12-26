@@ -3,6 +3,7 @@ import _ from 'lodash';
 import styled from 'styled-components';
 
 import { getAllPages, LegoThemesRead, rebrickable } from "../utils/rebrickable";
+import useCachedLocalStorageState from '../utils/useCachedLocalStorageState';
 
 const Form = styled.form`
   display: flex;
@@ -14,45 +15,14 @@ const Form = styled.form`
   height: 3em;
   background-color: #ffcf00;
 `;
-interface ThemeSelectProps {
-  onChange: (themeIds: number[]) => void,
-}
 
-function ThemeSelect({ onChange }: ThemeSelectProps) {
-  const [themes, setThemes] = useState<LegoThemesRead[]>([]);
-  const [themeIds, setThemeIds] = useState<string>();
-
-  /**
-   * Effects are for caching selected options in the browser local storage
-   */
-  useEffect(() => {
-    const ids = localStorage.getItem('themeIds');
-    if (ids) 
-      setThemeIds(ids);
-  }, []);
-
-  useEffect(() => {
-    if (themeIds) {
-      localStorage.setItem('themeIds', themeIds);
-      onChange(JSON.parse(themeIds));
-    }
-  }, [themeIds, onChange]);
-
-  // fetch data on every component mount. Isn't it wasteful? Cache a response? Opt-in to React Query?
-  useEffect( () => {
-    (async () => {
-      const themes = await getAllPages<LegoThemesRead>(rebrickable, '/api/v3/lego/themes/');
-      setThemes(themes);
-    })();
-  }, []);
-
+function groupThemesByName(themes: LegoThemesRead[]) {
   interface Theme {
     ids: number[],
     name: string,
   }
   
-  // sort by name and group id's with the same name
-  const themesGroupByName = themes
+  return themes
     .sort( (a, b) => a.name.localeCompare(b.name) )
     .map( t => ({ids: [t.id], name: t.name}) )
     .reduce( (themes:Theme[], curr:Theme) => {
@@ -64,14 +34,40 @@ function ThemeSelect({ onChange }: ThemeSelectProps) {
         return themes.concat(curr);
       }
     }, []);
+}
+interface ThemeSelectProps {
+  onChange: (themeIds: number[]) => void,
+}
+
+function ThemeSelect({ onChange }: ThemeSelectProps) {
+  const [themes, setThemes] = useState<LegoThemesRead[]>([]);
+  const [themeIds, setThemeIds] = useCachedLocalStorageState<number[]>('themeIds');
+
+  // fetch data on every component mount. Isn't it wasteful? Cache a response? Opt-in to React Query?
+  useEffect( () => {
+    (async () => {
+      const themes = await getAllPages<LegoThemesRead>(rebrickable, '/api/v3/lego/themes/');
+      setThemes(themes);
+    })();
+  }, []);
+
+  useEffect( () => {
+    if (themeIds)
+      onChange(themeIds);
+  }, [themeIds]); // themeIds could change when value is retrieved from LocalStorage cache or option selected
+
+  // sort by name and group id's with the same name
+  const themesGroupByName = groupThemesByName(themes);
 
   function onOptionChange(e: ChangeEvent<HTMLSelectElement>) {
-    setThemeIds(e.target.value);
+    //console.log('new option selected', e.target.value);
+    const themeIds = JSON.parse(e.target.value);
+    setThemeIds(themeIds);
   }
 
   return (
     <Form>
-      <select value={themeIds} onChange={onOptionChange}>
+      <select value={JSON.stringify(themeIds)} onChange={onOptionChange}>
         <option value="">--Select a theme--</option>
         {themesGroupByName.map(theme => 
           <option 
