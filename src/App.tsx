@@ -5,13 +5,10 @@ import './utils/rebrickable';
 import LegoSetDetails from './components/LegoSetDetails';
 import Overview from './components/Overview';
 
-const Container = styled.main`
-`;
-
 const Header = styled.header`
   width: 100%;
   text-align: center;
-  position: sticky;
+  position: relative;
   top: 0px;
   background: #ffcf00;
   height: 2em;

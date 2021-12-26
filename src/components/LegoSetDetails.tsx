@@ -1,12 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { rebrickable, LegoSetsRead } from '../utils/rebrickable';
+import { rebrickable, LegoSetsRead, LegoThemesRead } from '../utils/rebrickable';
 import { isSetLiked, toggleSetLike } from '../utils/user';
 
+const Article = styled.article`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 const Picture = styled.img`
-  width: 20em;
+  width: 30em;
   display: block;
+`;
+
+const Details = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
 `;
 
 interface LikeButtonProps {
@@ -20,24 +32,19 @@ const LikeButton = styled.button<LikeButtonProps>`
 
 function LegoSetDetails() {
   const [legoSet, setLegoSet] = useState<LegoSetsRead>();
-  const [isLiked, setIsLIked] = useState<boolean>();
+  const [isLiked, setIsLiked] = useState<boolean>();
   const [theme, setTheme] = useState('');
   const urlParams = useParams();
 
   useEffect( () => {
-    rebrickable
-      .get<LegoSetsRead>(`/api/v3/lego/sets/${urlParams.setId}/`)
-      .then(({data}) => {
-        setLegoSet(data)
-        setIsLIked(isSetLiked(data.set_num));
-        return data;
-      })
-      .then((data) => 
-        rebrickable.get(`/api/v3/lego/themes/${data.theme_id}/`)
-      )
-      .then(({data}) => {
-        setTheme(data.name)
-      });
+    (async () => {
+      const {data: set} = await rebrickable.get<LegoSetsRead>(`/api/v3/lego/sets/${urlParams.setId}/`);
+      setLegoSet(set);
+      setIsLiked(isSetLiked(set.set_num));
+
+      const {data: theme} = await rebrickable.get<LegoThemesRead>(`/api/v3/lego/themes/${set.theme_id}/`);
+      setTheme(theme.name);
+    })();
   }, [urlParams.setId]);
 
   if (!legoSet) return <p>'Loading...'</p>;
@@ -45,14 +52,21 @@ function LegoSetDetails() {
   return (
     <>
       <Link to="/">back</Link>
-      <article>
-        <p>{legoSet.name}</p>
+      <Article>
+        <header>{legoSet.name}</header>
         <Picture src={legoSet.set_img_url} alt={legoSet?.name} />
-        <p>Year: <span>{legoSet.year}</span></p>
-        <p>Number of parts: {legoSet.num_parts}</p>
-        <p>Theme: {theme} </p>
-        <LikeButton liked={isLiked} onClick={() => setIsLIked(toggleSetLike(legoSet.set_num))}>Like ❤️</LikeButton>
-      </article>
+        <Details style={{margin: '0.5em'}}>
+          <p>Year: {legoSet.year}</p>
+          <p>Number of parts: {legoSet.num_parts}</p>
+          <p>Theme: {theme}</p>
+          <LikeButton 
+            liked={isLiked} 
+            onClick={() => setIsLiked(toggleSetLike(legoSet.set_num))}
+          >
+            Like ❤️
+          </LikeButton>
+        </Details>
+      </Article>
     </>
   ) 
 }

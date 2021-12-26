@@ -5,11 +5,12 @@ import styled from 'styled-components';
 import { getAllPages, LegoThemesRead, rebrickable } from "../utils/rebrickable";
 
 const Form = styled.form`
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  text-align: center;
   position: sticky;
-  top: 2em;
+  top: 0px;
   height: 3em;
   background-color: #ffcf00;
 `;
