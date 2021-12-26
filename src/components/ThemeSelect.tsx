@@ -16,12 +16,15 @@ const Form = styled.form`
   background-color: #ffcf00;
 `;
 
-function groupThemesByName(themes: LegoThemesRead[]) {
+function groupThemesByName(themes?: LegoThemesRead[]) {
   interface Theme {
     ids: number[],
     name: string,
   }
-  
+
+  if (!themes) 
+    return [];
+
   return themes
     .sort( (a, b) => a.name.localeCompare(b.name) )
     .map( t => ({ids: [t.id], name: t.name}) )
@@ -40,16 +43,10 @@ interface ThemeSelectProps {
 }
 
 function ThemeSelect({ onChange }: ThemeSelectProps) {
-  const [themes, setThemes] = useState<LegoThemesRead[]>([]);
-  const [themeIds, setThemeIds] = useCachedLocalStorageState<number[]>('themeIds');
+  const initThemes = async () => await getAllPages<LegoThemesRead>(rebrickable, '/api/v3/lego/themes/');
 
-  // fetch data on every component mount. Isn't it wasteful? Cache a response? Opt-in to React Query?
-  useEffect( () => {
-    (async () => {
-      const themes = await getAllPages<LegoThemesRead>(rebrickable, '/api/v3/lego/themes/');
-      setThemes(themes);
-    })();
-  }, []);
+  const [themes, setThemes] = useCachedLocalStorageState<LegoThemesRead[]>('themes', initThemes);
+  const [themeIds, setThemeIds] = useCachedLocalStorageState<number[]>('themeIds');
 
   useEffect( () => {
     if (themeIds)
@@ -57,12 +54,11 @@ function ThemeSelect({ onChange }: ThemeSelectProps) {
   }, [themeIds]); // themeIds could change when value is retrieved from LocalStorage cache or option selected
 
   // sort by name and group id's with the same name
+  // TODO. we don't need to calculate this on each render. Find proper place for it. on themes update?
   const themesGroupByName = groupThemesByName(themes);
 
   function onOptionChange(e: ChangeEvent<HTMLSelectElement>) {
-    //console.log('new option selected', e.target.value);
-    const themeIds = JSON.parse(e.target.value);
-    setThemeIds(themeIds);
+    setThemeIds(JSON.parse(e.target.value));
   }
 
   return (
