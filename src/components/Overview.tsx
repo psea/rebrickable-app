@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LegoSets from "./LegoSets";
+import LegoSetsList from "./LegoSetsList";
 import ThemeSelect from "./ThemeSelect";
 
 function Overview() {
@@ -8,7 +8,7 @@ function Overview() {
   return (
     <>
       <ThemeSelect onChange={setThemeIds}/> 
-      <LegoSets themeIds={themeIds} />
+      <LegoSetsList themeIds={themeIds} />
     </>
   )
 }

@@ -25,7 +25,7 @@ To define permanent environment variables, create a file called .env in the root
 - `<App>` - top level component. Sets the routes for two views
   - `<Overview>` - overview page. Theme selector and sets list for the selected theme
     - `<ThemeSelect>` - theme selector. Dropdown themes list
-    - `<LegoSets>` - list of lego sets
+    - `<LegoSetsList>` - list of lego sets
   - `<LegoSetDetails>` - details about a set
 
 Components are self-contained with little shared state. 

@@ -26,11 +26,11 @@ const Picture = styled.img`
   width: 100%;
 `;
 
-interface LegoSetsProps {
+interface LegoSetsListProps {
   themeIds?: number[];
 }
 
-function LegoSets({themeIds}: LegoSetsProps ) {
+function LegoSetsList({themeIds}: LegoSetsListProps ) {
   const [legoSets, setLegoSets] = useState<LegoSetsRead[]>([]);
 
   useEffect( () => {
@@ -63,4 +63,4 @@ function LegoSets({themeIds}: LegoSetsProps ) {
   )
 }
 
-export default LegoSets;
+export default LegoSetsList;
