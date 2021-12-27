@@ -31,7 +31,8 @@ To define permanent environment variables, create a file called .env in the root
 Components are self-contained with little shared state. 
 
 State flow - list of theme ids - from `<ThemeSelect>` to `<LegoSets>`
-Shared state in web storage - "liked" status of a set. Set in `<LegoSetDetails>`
+
+Shared state in web storage - "liked" status of a set. Updates in `<LegoSetDetails>`
 
 ### Auxiliary functions
 `rebricable.ts` - types for REST API and convenience functions
