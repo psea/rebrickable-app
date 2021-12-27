@@ -1,4 +1,4 @@
-import { useEffect, ChangeEvent, useCallback } from 'react';
+import { useEffect, ChangeEvent, useRef } from 'react';
 import _ from 'lodash';
 import styled from 'styled-components';
 
@@ -43,7 +43,7 @@ interface ThemeSelectProps {
 }
 
 function ThemeSelect({ onChange }: ThemeSelectProps) {
-  const initThemes = async () => await getAllPages<LegoThemesRead>(rebrickable, '/api/v3/lego/themes/');
+  const initThemes = useRef(async () => await getAllPages<LegoThemesRead>(rebrickable, '/api/v3/lego/themes/'));
 
   /**
    * Keep fetched themes between component mounts
@@ -53,7 +53,7 @@ function ThemeSelect({ onChange }: ThemeSelectProps) {
    * - [Preferable?] Opt in to React-query. It will handle caching 
    * - move to rebricable.ts module, do the fetching/caching/etc there. Cache Web API? Expose themes through some convenience API
    */
-  const [themes] = useCachedWebStorageState<LegoThemesRead[]>('themes', useCallback(initThemes, []), sessionStorage);
+  const [themes] = useCachedWebStorageState<LegoThemesRead[]>('themes', initThemes.current, sessionStorage);
 
   /**
    * Keep selected themesIds between component mounts
