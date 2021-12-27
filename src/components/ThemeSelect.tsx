@@ -90,7 +90,7 @@ function ThemeSelect({ onChange }: ThemeSelectProps) {
             key={theme.ids[0]} 
             value={JSON.stringify(theme.ids)}
           >
-            {theme.ids + ' ' + theme.name}
+            {theme.name}
           </option>
         )} 
       </select>
