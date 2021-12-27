@@ -1,3 +1,43 @@
+# Rebricable client
+
+Sample rebricable.com client
+
+### Demo
+See it [live](https://psea.github.io/rebrickable/) &#127881;
+
+### Conventions
+ - Use modern React with hooks
+ - style with styled-components
+ - Component props typified by interface `<ComponentName>Props` for documentation purposes
+
+### Dependencies
+ - Axios
+ - React-router
+
+## Build instructions
+### Environment variables
+API Authorization key is set with REACT_APP_AUTH_KEY environment variable
+
+To define permanent environment variables, create a file called .env in the root of the project [more info](https://create-react-app.dev/docs/adding-custom-environment-variables)
+
+## Code walkthrough
+### Component hierarchy
+- `<App>` - top level component. Sets the routes for two views
+  - `<Overview>` - overview page. Theme selector and sets list for the selected theme
+    - `<ThemeSelect>` - theme selector. Dropdown themes list
+    - `<LegoSets>` - list of lego sets
+  - `<LegoSetDetails>` - details about a set
+
+Components are self-contained with little shared state. 
+
+State flow - list of theme ids - from `<ThemeSelect>` to `<LegoSets>`
+Shared state in web storage - "liked" status of a set. Set in `<LegoSetDetails>`
+
+### Auxiliary functions
+`rebricable.ts` - types for REST API and convenience functions
+`user.ts` - user state. currently only whenever he likes a set
+`useCachedWebStorage.ts` - hook similar to `useState` but state is persistant across component life cycles
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

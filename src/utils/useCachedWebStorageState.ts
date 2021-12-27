@@ -12,37 +12,41 @@ import { useEffect, useState, Dispatch, SetStateAction } from "react";
  * Long hook name is on purpose as a reminder of using it sparingly
  * 
  * @param key LocalStorage key under which state is saved and retrieved
+ * @param initialState could take data, function or async function
+ * @param storage localStorage or sessionStorage objects
  * @returns [state, setState function]
  * 
  * TODO:
  * handle other initialState types : T | (() => T) | (() => Promise<T>) | null
  */
 
-export default function useCachedLocalStorageState<T>(
+export default function useCachedWebStorageState<T>(
     key: string, 
-    initialState: (() => Promise<T>) | null = null): [T | undefined, Dispatch<SetStateAction<T | undefined>>] 
+    initialState: (() => Promise<T>) | null = null,
+    storage: Storage = localStorage): [T | undefined, Dispatch<SetStateAction<T | undefined>>] 
   {
   const [state, setState] = useState<T>();
 
   // retrieve state from a localStorage on instantiation
   useEffect(() => {
-    const value = localStorage.getItem(key);
+    const value = storage.getItem(key);
     if (value) {
       setState(JSON.parse(value));
       return;
     }
 
-    // initialState is a promise 
+    // assume initialState is a promise 
+    // See TODO list
     if (initialState)
       initialState().then(v => setState(v));
-  }, []);
+  }, [key, initialState, storage]);
 
   // update localStorage value on each state change
   useEffect(() => {
     if (state) {
-      localStorage.setItem(key, JSON.stringify(state));
+      storage.setItem(key, JSON.stringify(state));
     }
-  }, [state]);
+  }, [state, key, storage]);
 
   return [state, setState];
 }

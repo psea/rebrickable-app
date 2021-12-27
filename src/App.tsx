@@ -1,6 +1,5 @@
 import { Routes, Route, HashRouter } from "react-router-dom";
 import styled from "styled-components";
-import './utils/rebrickable';
 
 import LegoSetDetails from './components/LegoSetDetails';
 import Overview from './components/Overview';
